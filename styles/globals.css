@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+h1,
+h2,
+h3 {
+	margin-bottom: 1rem;
+}
+
+.error {
+	color: red;
+	margin-bottom: 1rem;
+}
+
+.repo-list {
+	list-style-type: none;
+	padding: 0;
+}
+
+.repo-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.5rem 0;
+	border-bottom: 1px solid #e1e4e8;
+}
+
+.repo-item span {
+	flex-grow: 1;
+}
+
+.text-center {
+	text-align: center;
+}
+
+.error {
+	color: red;
+	margin-bottom: 1rem;
+}
+
+.repo-list {
+	list-style-type: none;
+	padding: 0;
+}
+
+.repo-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.5rem 0;
+	border-bottom: 1px solid #e1e4e8;
+}
+
+.repo-item span {
+	flex-grow: 1;
+}
+
+.text-center {
+	text-align: center;
+}
