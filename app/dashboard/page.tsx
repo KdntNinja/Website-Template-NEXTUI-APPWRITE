@@ -17,9 +17,9 @@ const DashboardPage = () => {
 				const user = await account.get();
 
 				setUserId(user.$id);
-				fetchDocuments(user.$id);
+				await fetchDocuments(user.$id);
 			} catch (error) {
-				console.error("Failed to fetch user ID:", error);
+				alert(error);
 			}
 		};
 
@@ -28,21 +28,27 @@ const DashboardPage = () => {
 				const response = await databases.listDocuments(
 					process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID as string,
 					process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ID as string,
-					[`userId=${userId}`], // Corrected query format
+					[`userId=${userId}`],
 				);
 
 				setDocuments(response.documents);
 			} catch (error) {
-				console.error("Failed to fetch documents:", error);
+				alert(error);
 			}
 		};
 
-		fetchUserId();
+		const initialize = async () => {
+			await fetchUserId();
+		};
+
+		initialize().catch((error) => {
+			alert(error);
+		});
 	}, []);
 
 	const createNewDocument = async () => {
 		if (!userId) {
-			console.error("User ID is not available");
+			alert("User ID not found.");
 
 			return;
 		}
@@ -58,7 +64,7 @@ const DashboardPage = () => {
 
 			router.push(`/dashboard/docs/${userId}/${response.$id}`);
 		} catch (error) {
-			console.error("Failed to create document:", error);
+			alert(error);
 		} finally {
 			setLoading(false);
 		}
