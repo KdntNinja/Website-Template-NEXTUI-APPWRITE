@@ -1,13 +1,50 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Card } from "@nextui-org/react";
+import { Button, Card, CardBody, Input } from "@nextui-org/react";
+import dynamic from "next/dynamic";
 
 import { databases } from "@/config/appwrite";
-import DocumentTitleInput from "@/components/docs/DocumentTitleInput";
-import DocumentActions from "@/components/docs/DocumentActions";
-import DocumentContent from "@/components/docs/DocumentContent";
-import PrintContent from "@/components/docs/PrintContent";
+
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+
+import "react-quill/dist/quill.snow.css";
+
+const modules = {
+	toolbar: [
+		[{ font: [] }, { size: [] }],
+		["bold", "italic", "underline", "strike"],
+		[
+			{ list: "ordered" },
+			{ list: "bullet" },
+			{ indent: "-1" },
+			{ indent: "+1" },
+		],
+		[{ color: [] }, { background: [] }],
+		[{ align: [] }],
+		["link", "image", "video"],
+		["clean"],
+	],
+};
+
+const formats = [
+	"font",
+	"size",
+	"header",
+	"bold",
+	"italic",
+	"underline",
+	"strike",
+	"list",
+	"bullet",
+	"indent",
+	"color",
+	"background",
+	"align",
+	"link",
+	"image",
+	"video",
+];
 
 const DocumentEditorPage = () => {
 	const [loading, setLoading] = useState(false);
@@ -102,36 +139,36 @@ const DocumentEditorPage = () => {
 			event.preventDefault();
 			if (printRef.current) {
 				const printContent = `
-     <!DOCTYPE html>
-     <html lang="en">
-     <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>${title}</title>
-      <style>
-       @page {
-        size: auto;
-        margin: 0;
-       }
-       body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-       }
-       h1 {
-        text-align: center;
-        margin-bottom: 20px;
-       }
-       .content {
-        border: 1px solid #ccc;
-        padding: 20px;
-       }
-      </style>
-     </head>
-     <body>
-      <div class="content">${printRef.current.innerHTML}</div>
-     </body>
-     </html>
-    `;
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>${title}</title>
+     <style>
+      @page {
+       size: auto;
+       margin: 0;
+      }
+      body {
+       font-family: Arial, sans-serif;
+       margin: 20px;
+      }
+      h1 {
+       text-align: center;
+       margin-bottom: 20px;
+      }
+      .content {
+       border: 1px solid #ccc;
+       padding: 20px;
+      }
+     </style>
+    </head>
+    <body>
+     <div class="content">${printRef.current.innerHTML}</div>
+    </body>
+    </html>
+   `;
 
 				const printWindow = window.open("", "", "width=800,height=600");
 
@@ -154,22 +191,55 @@ const DocumentEditorPage = () => {
 	}, [document, content, title]);
 
 	return (
-		<div className="flex flex-col h-screen p-4">
-			<Card className="flex flex-col h-full">
-				<DocumentTitleInput setTitle={setTitle} title={title} />
-				<DocumentActions
-					deleteDocument={deleteDocument}
-					loading={loading}
-					saveDocument={saveDocument}
+		<div className="flex flex-col h-screen">
+			<div className="flex items-center justify-between p-4 border-b bg-gray-100">
+				<Input
+					fullWidth
+					className="text-2xl font-bold border-none outline-none flex-1"
+					placeholder="Document Title"
+					type="text"
+					value={title}
+					onChange={(e) => setTitle(e.target.value)}
 				/>
-				<DocumentContent
-					content={content}
-					printRef={printRef}
-					setContent={setContent}
-					title={title}
-				/>
-				<PrintContent content={content} printRef={printRef} title={title} />
-			</Card>
+				<div className="flex space-x-2">
+					<Button
+						color="primary"
+						isLoading={loading}
+						variant="flat"
+						onClick={saveDocument}
+					>
+						Save
+					</Button>
+					<Button
+						color="danger"
+						isLoading={loading}
+						variant="flat"
+						onClick={deleteDocument}
+					>
+						Delete
+					</Button>
+				</div>
+			</div>
+			<div className="flex-1 overflow-hidden p-4 bg-gray-50">
+				<Card className="h-full">
+					<CardBody className="h-full p-4">
+						<ReactQuill
+							formats={formats}
+							modules={modules}
+							style={{
+								height: "100%",
+								display: "flex",
+								flexDirection: "column",
+							}}
+							value={content}
+							onChange={setContent}
+						/>
+						<div ref={printRef} className="hidden">
+							<div dangerouslySetInnerHTML={{ __html: content }} />
+						</div>
+					</CardBody>
+				</Card>
+			</div>
 		</div>
 	);
 };
