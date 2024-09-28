@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@nextui-org/button";
+import { Query } from "appwrite";
 
 import { databases, account, ID } from "@/config/appwrite";
 
@@ -28,7 +29,7 @@ const DashboardPage = () => {
 				const response = await databases.listDocuments(
 					process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID as string,
 					process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ID as string,
-					[`userId=${userId}`],
+					[Query.equal("userId", userId)],
 				);
 
 				setDocuments(response.documents);
@@ -71,9 +72,10 @@ const DashboardPage = () => {
 	};
 
 	return (
-		<div className="container mx-auto p-4">
-			<h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+		<div className="container mx-auto p-4 flex flex-col items-center">
+			<h1 className="text-3xl font-bold mb-6">Dashboard</h1>
 			<Button
+				className="mb-6"
 				color="primary"
 				isLoading={loading}
 				variant="flat"
@@ -81,23 +83,28 @@ const DashboardPage = () => {
 			>
 				Create Document
 			</Button>
-			<div className="mt-4">
-				<h2 className="text-xl font-semibold mb-2">Your Documents</h2>
+			<div className="w-full">
+				<h2 className="text-2xl font-semibold mb-4 text-center">
+					Your Documents
+				</h2>
 				{documents.length > 0 ? (
-					<ul>
+					<ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 						{documents.map((doc) => (
-							<li key={doc.$id} className="mb-2">
+							<li
+								key={doc.$id}
+								className="border p-4 rounded-lg shadow hover:shadow-lg transition-shadow"
+							>
 								<a
-									className="text-blue-500"
+									className="text-blue-500 font-medium"
 									href={`/dashboard/docs/${userId}/${doc.$id}`}
 								>
-									{doc.title}
+									{doc.title || "Untitled Document"}
 								</a>
 							</li>
 						))}
 					</ul>
 				) : (
-					<p>No documents found.</p>
+					<p className="text-center">No documents found.</p>
 				)}
 			</div>
 		</div>

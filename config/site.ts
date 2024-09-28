@@ -6,7 +6,7 @@ const routes = {
 	verify: "/verify",
 	dashboard: "/dashboard",
 	profile: "/profile",
-	doc: "/dashboard/doc",
+	doc: "/dashboard/docs",
 	settings: "/settings",
 };
 
