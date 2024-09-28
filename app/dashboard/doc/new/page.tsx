@@ -1,28 +1,50 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@nextui-org/button";
 
-import { databases, ID } from "@/config/appwrite";
+import { databases, account, ID } from "@/config/appwrite";
 
 const NewDocumentPage = () => {
 	const [loading, setLoading] = useState(false);
+	const [userId, setUserId] = useState<string | null>(null);
 	const router = useRouter();
 
+	useEffect(() => {
+		fetchUserId().catch((error) => {
+			alert("Failed to fetch user ID: " + error);
+		});
+	}, []);
+
+	const fetchUserId = async () => {
+		try {
+			const user = await account.get();
+
+			setUserId(user.$id);
+		} catch (error) {
+			throw new Error("Failed to fetch user ID");
+		}
+	};
+
 	const createNewDocument = async () => {
+		if (!userId) {
+			alert("User ID is not available");
+
+			return;
+		}
+
 		setLoading(true);
 		try {
 			const response = await databases.createDocument(
 				process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID as string,
 				process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ID as string,
 				ID.unique(),
-				{ title: "Untitled Document", content: "" },
+				{ title: "Untitled Document", content: "", userId: userId },
 			);
 
-			router.push(`/dashboard/docs/${response.$id}`);
+			router.push(`/dashboard/docs_management/${userId}/${response.$id}`);
 		} catch (error) {
-			// eslint-disable-next-line no-console
-			console.error("Failed to create document:", error);
+			alert("Failed to create document");
 		} finally {
 			setLoading(false);
 		}
