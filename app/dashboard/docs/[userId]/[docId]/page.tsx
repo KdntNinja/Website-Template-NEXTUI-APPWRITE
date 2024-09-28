@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Button, Card, CardBody, Input } from "@nextui-org/react";
+import { Button, Card, CardBody, CardHeader, Input } from "@nextui-org/react";
 import dynamic from "next/dynamic";
 
 import { databases } from "@/config/appwrite";
@@ -191,55 +191,52 @@ const DocumentEditorPage = () => {
 	}, [document, content, title]);
 
 	return (
-		<div className="flex flex-col h-screen">
-			<div className="flex items-center justify-between p-4 border-b bg-gray-100">
-				<Input
-					fullWidth
-					className="text-2xl font-bold border-none outline-none flex-1"
-					placeholder="Document Title"
-					type="text"
-					value={title}
-					onChange={(e) => setTitle(e.target.value)}
-				/>
-				<div className="flex space-x-2">
-					<Button
-						color="primary"
-						isLoading={loading}
-						variant="flat"
-						onClick={saveDocument}
-					>
-						Save
-					</Button>
-					<Button
-						color="danger"
-						isLoading={loading}
-						variant="flat"
-						onClick={deleteDocument}
-					>
-						Delete
-					</Button>
-				</div>
-			</div>
-			<div className="flex-1 overflow-hidden p-4 bg-gray-50">
-				<Card className="h-full">
-					<CardBody className="h-full p-4">
-						<ReactQuill
-							formats={formats}
-							modules={modules}
-							style={{
-								height: "100%",
-								display: "flex",
-								flexDirection: "column",
-							}}
-							value={content}
-							onChange={setContent}
-						/>
-						<div ref={printRef} className="hidden">
-							<div dangerouslySetInnerHTML={{ __html: content }} />
-						</div>
-					</CardBody>
-				</Card>
-			</div>
+		<div className="flex flex-col h-screen p-4">
+			<Card className="flex flex-col h-full">
+				<CardHeader className="flex justify-between items-center p-4 border-b">
+					<Input
+						fullWidth
+						className="text-2xl font-bold border-none outline-none flex-1"
+						placeholder="Document Title"
+						type="text"
+						value={title}
+						onChange={(e) => setTitle(e.target.value)}
+					/>
+					<div className="flex space-x-2">
+						<Button
+							color="primary"
+							isLoading={loading}
+							variant="flat"
+							onClick={saveDocument}
+						>
+							Save
+						</Button>
+						<Button
+							color="danger"
+							isLoading={loading}
+							variant="flat"
+							onClick={deleteDocument}
+						>
+							Delete
+						</Button>
+					</div>
+				</CardHeader>
+				<CardBody
+					className="flex-1 overflow-hidden p-4"
+					style={{ height: "calc(100vh - 100px)" }}
+				>
+					<ReactQuill
+						formats={formats}
+						modules={modules}
+						style={{ height: "100%", display: "flex", flexDirection: "column" }}
+						value={content}
+						onChange={setContent}
+					/>
+					<div ref={printRef} className="hidden">
+						<div dangerouslySetInnerHTML={{ __html: content }} />
+					</div>
+				</CardBody>
+			</Card>
 		</div>
 	);
 };
