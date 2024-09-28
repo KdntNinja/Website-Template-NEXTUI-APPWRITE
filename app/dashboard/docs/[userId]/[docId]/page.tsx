@@ -1,14 +1,13 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { Button } from "@nextui-org/button";
-import dynamic from "next/dynamic";
+import React, { useState, useEffect, useRef } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { Card } from "@nextui-org/react";
 
 import { databases } from "@/config/appwrite";
-
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
-
-import "react-quill/dist/quill.snow.css";
+import DocumentTitleInput from "@/components/docs/DocumentTitleInput";
+import DocumentActions from "@/components/docs/DocumentActions";
+import DocumentContent from "@/components/docs/DocumentContent";
+import PrintContent from "@/components/docs/PrintContent";
 
 const DocumentEditorPage = () => {
 	const [loading, setLoading] = useState(false);
@@ -16,6 +15,8 @@ const DocumentEditorPage = () => {
 	const [content, setContent] = useState<string>("");
 	const [title, setTitle] = useState<string>("");
 	const { docId } = useParams();
+	const router = useRouter();
+	const printRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const fetchDocument = async (docId: string) => {
@@ -71,32 +72,104 @@ const DocumentEditorPage = () => {
 		}
 	};
 
+	const deleteDocument = async () => {
+		if (!document) {
+			alert("Document not found.");
+
+			return;
+		}
+
+		setLoading(true);
+		try {
+			await databases.deleteDocument(
+				process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID as string,
+				process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ID as string,
+				document.$id,
+			);
+			router.push("/dashboard");
+		} catch (error) {
+			alert("Failed to delete document");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const handleKeyDown = async (event: KeyboardEvent) => {
+		if (event.ctrlKey && event.key === "s") {
+			event.preventDefault();
+			await saveDocument();
+		} else if (event.ctrlKey && event.key === "p") {
+			event.preventDefault();
+			if (printRef.current) {
+				const printContent = `
+     <!DOCTYPE html>
+     <html lang="en">
+     <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${title}</title>
+      <style>
+       @page {
+        size: auto;
+        margin: 0;
+       }
+       body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+       }
+       h1 {
+        text-align: center;
+        margin-bottom: 20px;
+       }
+       .content {
+        border: 1px solid #ccc;
+        padding: 20px;
+       }
+      </style>
+     </head>
+     <body>
+      <div class="content">${printRef.current.innerHTML}</div>
+     </body>
+     </html>
+    `;
+
+				const printWindow = window.open("", "", "width=800,height=600");
+
+				if (printWindow) {
+					printWindow.document.write(printContent);
+					printWindow.document.close();
+					printWindow.onafterprint = () => printWindow.close();
+					printWindow.print();
+				}
+			}
+		}
+	};
+
+	useEffect(() => {
+		window.addEventListener("keydown", handleKeyDown);
+
+		return () => {
+			window.removeEventListener("keydown", handleKeyDown);
+		};
+	}, [document, content, title]);
+
 	return (
-		<div className="flex flex-col h-screen">
-			<div className="flex justify-between items-center p-4 border-b">
-				<input
-					className="text-2xl font-bold border-none outline-none flex-1"
-					placeholder="Document Title"
-					type="text"
-					value={title}
-					onChange={(e) => setTitle(e.target.value)}
+		<div className="flex flex-col h-screen p-4">
+			<Card className="flex flex-col h-full">
+				<DocumentTitleInput setTitle={setTitle} title={title} />
+				<DocumentActions
+					deleteDocument={deleteDocument}
+					loading={loading}
+					saveDocument={saveDocument}
 				/>
-				<Button
-					color="primary"
-					isLoading={loading}
-					variant="flat"
-					onClick={saveDocument}
-				>
-					Save
-				</Button>
-			</div>
-			<div className="flex-1 overflow-hidden">
-				<ReactQuill
-					style={{ height: "100%", display: "flex", flexDirection: "column" }}
-					value={content}
-					onChange={setContent}
+				<DocumentContent
+					content={content}
+					printRef={printRef}
+					setContent={setContent}
+					title={title}
 				/>
-			</div>
+				<PrintContent content={content} printRef={printRef} title={title} />
+			</Card>
 		</div>
 	);
 };
