@@ -38,10 +38,9 @@ const AboutPage = () => {
 					<p className={`${subtitle()} text-center max-w-3xl mb-8`}>
 						{siteConfig.name} is a modern, fast, and intuitive platform for
 						managing your documents. With a sleek design and robust features,{" "}
-						{siteConfig.name}
-						aims to enhance your document management experience, making it
-						easier to collaborate, track progress, and ensure the security of
-						your documents.
+						{siteConfig.name} aims to enhance your document management
+						experience, making it easier to collaborate, track progress, and
+						ensure the security of your documents.
 					</p>
 
 					<Section title="Our Mission">
