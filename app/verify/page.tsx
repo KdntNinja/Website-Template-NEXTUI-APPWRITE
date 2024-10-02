@@ -33,7 +33,7 @@ const VerifyPage = () => {
 					}
 				})
 				.catch((error) => {
-					console.error("Verification failed:", error);
+					error("Verification failed:", error);
 					setMessage(
 						"Verification failed. Please try again or contact support.",
 					);

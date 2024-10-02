@@ -1,11 +1,11 @@
 "use client";
 
-import { useAuthCheck } from "@/hooks/useAuthCheck";
-import { siteConfig } from "@/config/site";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { button as buttonStyles } from "@nextui-org/theme";
 import { useRouter } from "next/navigation";
 
+import { siteConfig } from "@/config/site";
+import { useAuthCheck } from "@/hooks/useAuthCheck";
 import { title, subtitle } from "@/components/primitives";
 
 export default function Home() {

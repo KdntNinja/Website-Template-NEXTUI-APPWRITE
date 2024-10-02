@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 
 import { account } from "@/config/appwrite";
 import { siteConfig } from "@/config/site";
+import { useAuthCheck } from "@/hooks/useAuthCheck";
 
 const initialValues = {
 	email: "",
@@ -21,6 +22,7 @@ const LoginSchema = Yup.object().shape({
 });
 
 const LoginPage = () => {
+	useAuthCheck();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const router = useRouter();
@@ -33,15 +35,11 @@ const LoginPage = () => {
 		setError(null);
 
 		try {
-			const response = await account.createEmailPasswordSession(
-				values.email,
-				values.password,
-			);
-			console.log("Login successful:", response);
+			await account.createEmailPasswordSession(values.email, values.password);
 
 			router.push(siteConfig.routes.dashboard);
 		} catch (error: any) {
-			console.error("Login failed:", error);
+			error("Login failed:", error);
 			setError(error.message || "Login failed. Please check your credentials.");
 		} finally {
 			setLoading(false);
@@ -60,8 +58,8 @@ const LoginPage = () => {
 			>
 				{({ values, errors, touched, handleChange, handleSubmit }) => (
 					<form
-						onSubmit={handleSubmit}
 						className="flex flex-col w-1/2 gap-4 mb-4"
+						onSubmit={handleSubmit}
 					>
 						<Input
 							errorMessage={errors.email}

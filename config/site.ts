@@ -6,16 +6,15 @@ const routes = {
 	verify: "/verify",
 	dashboard: "/dashboard",
 	profile: "/profile",
-	doc: "/dashboard/docs",
 	settings: "/settings",
 };
 
 export const siteConfig = {
 	name: "Versionary",
 	prodDomain: "https://kdnsite.xyz",
-	title_p1: "The new",
-	title_p2: "Docs",
-	title_p3: "management solution.",
+	title_p1: "/",
+	title_p2: "config",
+	title_p3: "/site.ts",
 	description: "Beautiful, fast, and modern. Everything you need.",
 	routes,
 	navItems: [
@@ -30,34 +29,16 @@ export const siteConfig = {
 	],
 	features: [
 		{
-			label: "Real-time Collaboration",
-			description:
-				"Work together with your team in real-time, no matter where you are.",
+			label: "/config/site.ts",
+			description: "/config/site.ts",
 		},
 		{
-			label: "Sleek Modern Design",
-			description:
-				"Enjoy a visually stunning interface that enhances user experience and engagement.",
+			label: "/config/site.ts",
+			description: "/config/site.ts",
 		},
 		{
-			label: "Intuitive Document Management",
-			description:
-				"Easily organize, track, and collaborate on documents with user-friendly tools.",
-		},
-		{
-			label: "Robust Security",
-			description:
-				"Keep your documents safe with advanced security features and regular backups.",
-		},
-		{
-			label: "Seamless Integration",
-			description:
-				"Integrate effortlessly with your favorite tools and services for a streamlined workflow.",
-		},
-		{
-			label: "Customizable Workflows",
-			description:
-				"Tailor your document management experience with flexible and customizable workflows.",
+			label: "/config/site.ts",
+			description: "/config/site.ts",
 		},
 	],
 };

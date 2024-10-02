@@ -7,8 +7,10 @@ import { ID } from "appwrite";
 import { Formik, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
+
 import { account } from "@/config/appwrite";
 import { siteConfig } from "@/config/site";
+import { useAuthCheck } from "@/hooks/useAuthCheck";
 
 const initialValues = {
 	name: "",
@@ -27,6 +29,7 @@ const SignupSchema = Yup.object().shape({
 });
 
 const SignupPage = () => {
+	useAuthCheck();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const router = useRouter();
@@ -45,18 +48,16 @@ const SignupPage = () => {
 				values.password,
 				values.name,
 			);
-			console.log("Registration successful:", response);
 
 			await login(values.email, values.password);
 
 			const verificationResponse = await account.createVerification(
 				`${siteConfig.prodDomain}${siteConfig.routes.verify}`,
 			);
-			console.log("Verification email sent:", verificationResponse);
 
 			router.push(siteConfig.routes.dashboard);
 		} catch (error: any) {
-			console.error("Registration failed:", error);
+			error("Registration failed:", error);
 
 			if (error.response) {
 				setError(`Signup failed: ${error.response.data.message}`);
@@ -87,8 +88,8 @@ const SignupPage = () => {
 			>
 				{({ values, errors, touched, handleChange, handleSubmit }) => (
 					<form
-						onSubmit={handleSubmit}
 						className="flex flex-col w-1/2 gap-4 mb-4"
+						onSubmit={handleSubmit}
 					>
 						<Input
 							errorMessage={errors.name}
